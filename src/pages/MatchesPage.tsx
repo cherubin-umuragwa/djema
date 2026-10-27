@@ -34,6 +34,7 @@ export function MatchesPage() {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [request, setRequest] = useState<ServiceRequest | null>(null);
   const [results, setResults] = useState<MatchResult[]>([]);
+  const [providerMap, setProviderMap] = useState<Map<string, import('@/types/provider').Provider>>(new Map());
   const [errorMessage, setErrorMessage] = useState<string>('');
   // Use a ref to track whether matching has started — avoids stale closure in subscribeToMatch callback
   const matchingStartedRef = useRef(false);
@@ -71,6 +72,16 @@ export function MatchesPage() {
             if (match && match.status === 'completed') {
               setResults(match.results);
               setPageState('results');
+              // If providerMap is not yet populated (e.g. back navigation to existing match),
+              // fetch providers so ProviderCard can resolve contact details.
+              setProviderMap(prev => {
+                if (prev.size === 0) {
+                  getAvailableProviders().then(providers => {
+                    setProviderMap(new Map(providers.map(p => [p.uid, p])));
+                  }).catch(() => {/* non-fatal: contact buttons will be hidden */});
+                }
+                return prev;
+              });
               return;
             }
             if (match && match.status === 'no_matches') {
@@ -84,6 +95,10 @@ export function MatchesPage() {
               try {
                 const providers = await getAvailableProviders();
                 const matchResults = await runMatching(req, providers);
+                // Build a lookup map: providerId → Provider for contact details at display time.
+                // Contact details are NOT stored in the match document (which is publicly readable).
+                const map = new Map(providers.map(p => [p.uid, p]));
+                setProviderMap(map);
                 const matchStatus = matchResults.length > 0 ? 'completed' : 'no_matches';
                 await createMatch(requestId!, {
                   requestId: requestId!,
@@ -189,14 +204,19 @@ export function MatchesPage() {
         </h1>
         <p className="font-sans text-slate-600 mt-2">Here are the best matches based on skill and location.</p>
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {results.map(r => (
-            <ProviderCard
-              key={r.providerId}
-              result={r}
-              serviceType={request?.serviceType ?? ''}
-              requestLocationName={request?.locationName ?? ''}
-            />
-          ))}
+          {results.map(r => {
+            const provider = providerMap.get(r.providerId);
+            if (!provider) return null;
+            return (
+              <ProviderCard
+                key={r.providerId}
+                result={r}
+                provider={provider}
+                serviceType={request?.serviceType ?? ''}
+                requestLocationName={request?.locationName ?? ''}
+              />
+            );
+          })}
         </div>
       </PageWrapper>
     );

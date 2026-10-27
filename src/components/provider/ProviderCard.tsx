@@ -3,20 +3,24 @@ import { MapPin, Navigation, MessageCircle, Mail } from 'lucide-react';
 import { Avatar } from '@/components/common/Avatar';
 import { Badge } from '@/components/common/Badge';
 import type { MatchResult } from '@/types/match';
+import type { Provider } from '@/types/provider';
 import { generateWhatsAppLink, requesterContactMessage } from '@/utils/whatsapp';
 
 interface ProviderCardProps {
   result: MatchResult;
+  // Provider is passed separately so contact details are not stored in the publicly-readable
+  // match document. Resolved from the providers collection at display time.
+  provider: Provider;
   serviceType: string;
   requestLocationName: string;
 }
 
-export function ProviderCard({ result, serviceType, requestLocationName }: ProviderCardProps) {
+export function ProviderCard({ result, provider, serviceType, requestLocationName }: ProviderCardProps) {
   const MAX_SKILLS = 4;
   const visibleSkills = result.skills.slice(0, MAX_SKILLS);
   const extraCount = result.skills.length - MAX_SKILLS;
   const waLink = generateWhatsAppLink(
-    result.whatsappNumber,
+    provider.whatsappNumber,
     requesterContactMessage(result.displayName, serviceType, requestLocationName),
   );
 
@@ -65,7 +69,7 @@ export function ProviderCard({ result, serviceType, requestLocationName }: Provi
           Contact on WhatsApp
         </a>
         <a
-          href={`mailto:${result.email}`}
+          href={`mailto:${provider.email}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center gap-2 rounded-lg font-semibold font-sans text-sm px-5 py-2.5 min-h-[44px] border border-green-600 text-green-600 hover:bg-green-50 transition-colors duration-150"

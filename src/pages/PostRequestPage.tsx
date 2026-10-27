@@ -25,6 +25,8 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export function PostRequestPage() {
+  // Note: photo upload field (DESIGN_SYSTEM.md §10.2) is omitted — Firebase Storage requires
+  // billing (Spark plan does not include Storage). This is intentional given project constraints.
   const navigate = useNavigate();
   const { categories } = useCategories();
   const [submitError, setSubmitError] = useState<string | null>(null);

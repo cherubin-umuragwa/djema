@@ -145,7 +145,10 @@ export async function createRequest(
 
 export async function updateRequest(id: string, data: Partial<ServiceRequest>): Promise<void> {
   try {
-    await updateDoc(doc(db, 'requests', id), { ...data });
+    await updateDoc(doc(db, 'requests', id), {
+      ...data,
+      updatedAt: serverTimestamp(),
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     throw new Error('Failed to update request: ' + message);

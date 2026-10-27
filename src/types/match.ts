@@ -8,8 +8,8 @@ export interface MatchResult {
   profilePhotoUrl: string | null;
   locationName: string;
   skills: string[];
-  whatsappNumber: string;
-  email: string;
+  // whatsappNumber and email are intentionally omitted here — MatchDocument is publicly readable
+  // (allow read: if true). Contact details are resolved at display time from the provider document.
   skillScore: number;
   proximityScore: number;
   finalScore: number;

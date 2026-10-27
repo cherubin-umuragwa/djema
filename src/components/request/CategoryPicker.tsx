@@ -23,7 +23,7 @@ export function CategoryPicker({ value, onChange, categories, error }: CategoryP
               key={cat.id}
               type="button"
               onClick={() => onChange(isSelected ? '' : cat.id)}
-              className={`rounded-xl p-4 flex flex-col items-center gap-2 cursor-pointer transition-colors ${
+              className={`rounded-lg p-4 flex flex-col items-center gap-2 cursor-pointer transition-colors ${
                 isSelected
                   ? 'border-2 border-green-600 bg-green-50 text-green-700'
                   : 'border border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'

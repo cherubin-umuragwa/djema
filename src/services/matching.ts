@@ -64,8 +64,8 @@ export async function runMatching(
         profilePhotoUrl: null,
         locationName: provider.locationName,
         skills: provider.skills,
-        whatsappNumber: provider.whatsappNumber,
-        email: provider.email,
+        // whatsappNumber and email omitted — MatchDocument is publicly readable.
+        // Contact details are resolved at display time from the provider document.
         skillScore,
         proximityScore: proxScore,
         finalScore,
