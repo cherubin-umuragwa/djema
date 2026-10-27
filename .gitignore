@@ -1,6 +1,10 @@
 node_modules/
 dist/
+.env
 .env.local
+.env*.local
 functions/.env
 .firebase/
 *.local
+*.json.key
+service-account*.json
