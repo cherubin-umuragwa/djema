@@ -91,53 +91,76 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* Mobile slide-over */}
+      {/* Mobile slide-over — backdrop + panel */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-y-0 right-0 w-72 bg-white shadow-xl z-50 flex flex-col pt-16">
-          <div className="px-4 py-6 flex flex-col gap-3">
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/board"
-                  className="font-sans text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-100 flex items-center gap-2"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Browse Requests <ChevronRight size={16} aria-hidden="true" />
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="font-sans text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-100"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/profile/edit"
-                  className="font-sans text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-100"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Edit Profile
-                </Link>
-                <button
-                  onClick={() => { void handleSignOut(); setMobileOpen(false); }}
-                  className="text-left font-sans text-red-600 py-2 px-3 rounded-lg hover:bg-red-50 flex items-center gap-2"
-                >
-                  <LogOut size={14} aria-hidden="true" />
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <>
-                <Button variant="primary" href="/post-request" className="w-full" onClick={() => setMobileOpen(false)}>
-                  Post a Request
-                </Button>
-                <Button variant="ghost" href="/login" className="w-full" onClick={() => setMobileOpen(false)}>
-                  Sign in as Provider
-                </Button>
-              </>
-            )}
+        <>
+          {/* Backdrop — tap anywhere to close */}
+          <div
+            className="md:hidden fixed inset-0 bg-black/40 z-40"
+            onClick={() => setMobileOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Panel */}
+          <div className="md:hidden fixed inset-y-0 right-0 w-72 bg-white shadow-xl z-50 flex flex-col">
+            {/* Panel header with close button */}
+            <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
+              <span className="font-display font-bold text-lg text-slate-900">Menu</span>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="p-2 text-slate-600 hover:bg-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                aria-label="Close menu"
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </div>
+
+            {/* Nav links */}
+            <div className="px-4 py-6 flex flex-col gap-3">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/board"
+                    className="font-sans text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-100 flex items-center gap-2"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Browse Requests <ChevronRight size={16} aria-hidden="true" />
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className="font-sans text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-100"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/profile/edit"
+                    className="font-sans text-slate-700 py-2 px-3 rounded-lg hover:bg-slate-100"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    Edit Profile
+                  </Link>
+                  <button
+                    onClick={() => { void handleSignOut(); setMobileOpen(false); }}
+                    className="text-left font-sans text-red-600 py-2 px-3 rounded-lg hover:bg-red-50 flex items-center gap-2"
+                  >
+                    <LogOut size={14} aria-hidden="true" />
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Button variant="primary" href="/post-request" className="w-full" onClick={() => setMobileOpen(false)}>
+                    Post a Request
+                  </Button>
+                  <Button variant="ghost" href="/login" className="w-full" onClick={() => setMobileOpen(false)}>
+                    Sign in as Provider
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </nav>
   );
