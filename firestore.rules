@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return isAuth() && request.auth.token.role == 'admin';
+    }
+
+    // Categories are public-read; only admins can write.
+    match /categories/{catId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Provider profiles: public-read, owner-write.
+    match /providers/{uid} {
+      allow read: if true;
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid);
+      allow delete: if isOwner(uid);
+    }
+
+    // Service requests: public-read and public-create.
+    // Updates restricted to a safe subset of fields.
+    // Deletes are forbidden.
+    match /requests/{requestId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['isPublic', 'requesterWhatsapp', 'requesterEmail', 'status', 'updatedAt']);
+      allow delete: if false;
+    }
+
+    // Match results written by the client after TF.js matching (no Cloud Functions).
+    match /matches/{requestId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+  }
+}

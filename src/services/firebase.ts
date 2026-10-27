@@ -6,7 +6,9 @@ import { getAnalytics, type Analytics } from 'firebase/analytics';
 // Note: Firebase Storage is excluded — it requires a billing account on Spark plan.
 // Provider avatars use initials fallback. Request photos are not supported in v1.
 
-const firebaseConfig = {
+// Exported so scripts/seedCategories.ts can import it without re-declaring the values.
+// This is the public client-side config — safe to export.
+export const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string,

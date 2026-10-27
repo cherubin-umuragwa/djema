@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { useAuthStore } from '@/store/authStore';
 
@@ -15,14 +15,9 @@ export function useAuth() {
     return unsubscribe;
   }, [setUser, setLoading]);
 
-  async function signOut() {
-    await firebaseSignOut(auth);
-  }
-
   return {
     user,
     loading,
     isAuthenticated: user !== null,
-    signOut,
   };
 }
