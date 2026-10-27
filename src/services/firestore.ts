@@ -80,7 +80,6 @@ export function subscribeToProvider(
       callback(snap.exists() ? (snap.data() as Provider) : null);
     },
     (err) => {
-      console.error('Provider subscription error:', err.message);
       if (onError) {
         onError(err);
       } else {
@@ -112,7 +111,6 @@ export function subscribeToCategories(
       callback(snap.docs.map((d) => d.data() as Category));
     },
     (err) => {
-      console.error('Categories subscription error:', err.message);
       if (onError) {
         onError(err);
       } else {

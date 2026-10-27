@@ -20,9 +20,13 @@ import { runMatching } from '@/services/matching';
 import { getSessionToken } from '@/utils/session';
 import type { ServiceRequest } from '@/types/request';
 import type { MatchDocument, MatchResult } from '@/types/match';
+import type { Provider } from '@/types/provider';
 
 const publicFormSchema = z.object({
-  whatsapp: z.string().min(8, 'Please enter a valid WhatsApp number'),
+  whatsapp: z
+    .string()
+    .min(8, 'Please enter a valid WhatsApp number')
+    .regex(/^\+[1-9]\d{7,14}$/, 'Use E.164 format: +256700123456'),
   email: z.string().email('Please enter a valid email').or(z.literal('')).optional(),
 });
 type PublicFormValues = z.infer<typeof publicFormSchema>;
@@ -34,7 +38,7 @@ export function MatchesPage() {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [request, setRequest] = useState<ServiceRequest | null>(null);
   const [results, setResults] = useState<MatchResult[]>([]);
-  const [providerMap, setProviderMap] = useState<Map<string, import('@/types/provider').Provider>>(new Map());
+  const [providerMap, setProviderMap] = useState<Map<string, Provider>>(new Map());
   const [errorMessage, setErrorMessage] = useState<string>('');
   // Use a ref to track whether matching has started — avoids stale closure in subscribeToMatch callback
   const matchingStartedRef = useRef(false);
@@ -102,6 +106,7 @@ export function MatchesPage() {
                 const matchStatus = matchResults.length > 0 ? 'completed' : 'no_matches';
                 await createMatch(requestId!, {
                   requestId: requestId!,
+                  sessionToken: req.sessionToken,
                   status: matchStatus,
                   results: matchResults,
                   processedAt: Timestamp.now(),

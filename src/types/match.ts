@@ -18,6 +18,8 @@ export interface MatchResult {
 
 export interface MatchDocument {
   requestId: string;
+  // sessionToken mirrors the parent request's token so Firestore rules can verify ownership.
+  sessionToken: string;
   status: MatchStatus;
   results: MatchResult[];
   processedAt: Timestamp | null;

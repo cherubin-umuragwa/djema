@@ -44,12 +44,16 @@ service cloud.firestore {
     // Guards:
     //   1. Written requestId field must match the document path (prevents cross-document poisoning).
     //   2. Cannot overwrite a document already in 'completed' status (prevents suppressing results).
+    //   3. sessionToken in the match document must match the parent request's sessionToken
+    //      (prevents a foreign browser tab from writing results for a request it didn't create).
     match /matches/{requestId} {
       allow read: if true;
-      allow write: if request.resource.data.keys().hasAll(['requestId', 'status', 'results', 'processedAt', 'createdAt'])
+      allow write: if request.resource.data.keys().hasAll(['requestId', 'status', 'results', 'processedAt', 'createdAt', 'sessionToken'])
         && request.resource.data.requestId == requestId
         && (!exists(/databases/$(database)/documents/matches/$(requestId))
-            || resource.data.status != 'completed');
+            || resource.data.status != 'completed')
+        && get(/databases/$(database)/documents/requests/$(requestId)).data.sessionToken
+             == request.resource.data.sessionToken;
     }
   }
 }
