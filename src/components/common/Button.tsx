@@ -1,5 +1,6 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 type ButtonVariant = 'primary' | 'secondary' | 'whatsapp' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -62,9 +63,9 @@ export function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes}>
+      <Link to={href} className={classes}>
         {content}
-      </a>
+      </Link>
     );
   }
 

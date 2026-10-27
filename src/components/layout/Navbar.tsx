@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/common/Button';
+import { Avatar } from '@/components/common/Avatar';
 import { useAuth } from '@/hooks/useAuth';
-import { auth } from '@/services/firebase';
-import { signOut } from 'firebase/auth';
+import { signOut } from '@/services/auth';
 
 export function Navbar() {
   const { user, isAuthenticated } = useAuth();
@@ -12,13 +12,9 @@ export function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   async function handleSignOut() {
-    await signOut(auth);
+    await signOut();
     setDropdownOpen(false);
   }
-
-  const initials = user?.displayName
-    ? user.displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('')
-    : 'P';
 
   return (
     <nav
@@ -43,19 +39,11 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen((o) => !o)}
-                  className="w-9 h-9 rounded-full bg-green-100 text-green-700 font-sans font-semibold text-sm flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="w-9 h-9 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   aria-label="Account menu"
                   aria-expanded={dropdownOpen}
                 >
-                  {user?.photoURL ? (
-                    <img
-                      src={user.photoURL}
-                      alt={user.displayName || 'Profile'}
-                      className="w-9 h-9 rounded-full object-cover"
-                    />
-                  ) : (
-                    initials
-                  )}
+                  <Avatar name={user?.displayName ?? 'Provider'} size="sm" />
                 </button>
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-md border border-slate-100 py-1 z-40">

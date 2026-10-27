@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { AlertCircle, MapPin } from 'lucide-react';
+import { geocodeLocation } from '@/utils/geocoding';
+import type { NominatimResult } from '@/utils/geocoding';
 
 interface LocationValue {
   locationName: string;
@@ -9,104 +11,80 @@ interface LocationValue {
 
 interface LocationInputProps {
   value: string;
-  onLocationSelect: (value: LocationValue) => void;
+  onLocationSelect: (loc: LocationValue) => void;
   error?: string;
-  label: string;
+  label?: string;
   required?: boolean;
-}
-
-// Extend Window to allow Google Maps types without full @types/google.maps dep
-declare global {
-  interface Window {
-    google?: {
-      maps?: {
-        places?: {
-          Autocomplete: new (
-            input: HTMLInputElement,
-            options?: object
-          ) => {
-            addListener: (event: string, handler: () => void) => void;
-            getPlace: () => {
-              name?: string;
-              geometry?: { location?: { lat: () => number; lng: () => number } };
-              formatted_address?: string;
-            };
-          };
-        };
-      };
-    };
-  }
 }
 
 export function LocationInput({
   value,
   onLocationSelect,
   error,
-  label,
+  label = 'Location',
   required,
 }: LocationInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [localValue, setLocalValue] = useState(value);
-  const [mapsAvailable, setMapsAvailable] = useState(false);
+  const [inputText, setInputText] = useState(value);
+  const [suggestions, setSuggestions] = useState<NominatimResult[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
+  // Sync external value changes (e.g. form reset)
   useEffect(() => {
-    setLocalValue(value);
+    setInputText(value);
   }, [value]);
 
+  // Close dropdown on outside click
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      // No API key — degrade gracefully to plain text input
-      return;
+    function handleMouseDown(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
     }
-
-    if (window.google?.maps?.places) {
-      initAutocomplete();
-      return;
-    }
-
-    const scriptId = 'google-maps-script';
-    if (document.getElementById(scriptId)) {
-      // Script already loading — wait for it
-      const interval = setInterval(() => {
-        if (window.google?.maps?.places) {
-          clearInterval(interval);
-          initAutocomplete();
-        }
-      }, 200);
-      return () => clearInterval(interval);
-    }
-
-    const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
-    script.async = true;
-    script.onload = initAutocomplete;
-    document.head.appendChild(script);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
   }, []);
 
-  function initAutocomplete() {
-    if (!inputRef.current || !window.google?.maps?.places) return;
-    setMapsAvailable(true);
-    const ac = new window.google.maps.places.Autocomplete(inputRef.current, {
-      componentRestrictions: { country: ['ug', 'ke', 'tz', 'rw'] },
-      fields: ['name', 'geometry', 'formatted_address'],
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const text = e.target.value;
+    setInputText(text);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (text.trim().length < 2) {
+      setSuggestions([]);
+      setIsOpen(false);
+      return;
+    }
+
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const results = await geocodeLocation(text);
+        setSuggestions(results);
+        setIsOpen(results.length > 0);
+      } catch {
+        setSuggestions([]);
+        setIsOpen(false);
+      }
+    }, 500);
+  }
+
+  function handleSuggestionClick(item: NominatimResult) {
+    onLocationSelect({
+      locationName: item.display_name,
+      lat: parseFloat(item.lat),
+      lng: parseFloat(item.lon),
     });
-    ac.addListener('place_changed', () => {
-      const place = ac.getPlace();
-      const lat = place.geometry?.location?.lat() ?? 0;
-      const lng = place.geometry?.location?.lng() ?? 0;
-      const locationName = place.formatted_address || place.name || '';
-      setLocalValue(locationName);
-      onLocationSelect({ locationName, lat, lng });
-    });
+    setInputText(item.display_name);
+    setSuggestions([]);
+    setIsOpen(false);
   }
 
   const inputId = label.toLowerCase().replace(/\s+/g, '-');
 
   return (
-    <div className="w-full">
+    <div className="w-full" ref={containerRef}>
       <label
         htmlFor={inputId}
         className="block font-sans font-medium text-sm text-slate-700 mb-1.5"
@@ -121,18 +99,11 @@ export function LocationInput({
           aria-hidden="true"
         />
         <input
-          ref={inputRef}
           id={inputId}
           type="text"
-          value={localValue}
-          onChange={(e) => {
-            setLocalValue(e.target.value);
-            if (!mapsAvailable) {
-              // Fallback plain text: propagate manually with zero coords
-              onLocationSelect({ locationName: e.target.value, lat: 0, lng: 0 });
-            }
-          }}
-          placeholder={mapsAvailable ? 'Start typing a location...' : 'Enter your location'}
+          value={inputText}
+          onChange={handleInputChange}
+          placeholder="Start typing a location..."
           className={`
             w-full border rounded-lg pl-9 pr-4 py-3 font-sans text-base text-slate-900
             bg-white placeholder:text-slate-400
@@ -142,19 +113,36 @@ export function LocationInput({
           `}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? `${inputId}-error` : undefined}
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          autoComplete="off"
         />
+        {isOpen && suggestions.length > 0 && (
+          <ul
+            role="listbox"
+            className="absolute z-10 w-full mt-1 bg-white rounded-xl shadow-md border border-slate-100"
+          >
+            {suggestions.map((item) => (
+              <li
+                key={`${item.lat}-${item.lon}`}
+                role="option"
+                aria-selected="false"
+                onMouseDown={() => handleSuggestionClick(item)}
+                className="px-4 py-2.5 font-sans text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                {item.display_name}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      {!mapsAvailable && !import.meta.env.VITE_GOOGLE_MAPS_API_KEY && (
-        <p className="font-sans text-slate-400 text-xs mt-1">
-          Location autocomplete unavailable. Enter your location manually.
-        </p>
-      )}
       {error && (
         <p
           id={`${inputId}-error`}
           className="font-sans text-red-600 text-sm mt-1.5 flex items-center gap-1.5"
           role="alert"
         >
+          <AlertCircle size={14} aria-hidden="true" />
           {error}
         </p>
       )}
