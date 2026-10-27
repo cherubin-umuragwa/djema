@@ -1,0 +1,31 @@
+{
+  "project_type": "React 18 SPA (Vite + TypeScript) + Firebase Spark (Auth, Firestore, Hosting)",
+  "language": "TypeScript 5 (strict mode, no any)",
+  "build_system": "Vite 5 — `npm run build` runs `tsc -b && vite build`. The `@/` alias resolves to `src/` via vite.config.ts `resolve.alias`. All imports use `@/` prefix — never relative paths for cross-directory imports.",
+  "test_framework": "None configured — verification is `npx tsc --noEmit` (type check) then `npx vite build` (full build).",
+  "build_command": "npx tsc --noEmit && npx vite build",
+  "test_command": "npx tsc --noEmit",
+  "verification_instructions": "1. Run `cd 'c:\\Users\\CHERUBIN\\Documents\\CHAM\\CHAM HACKATHON\\Djema' && npx tsc --noEmit` — must exit 0. 2. Run `cd 'c:\\Users\\CHERUBIN\\Documents\\CHAM\\CHAM HACKATHON\\Djema' && npx vite build` — must exit 0. Fix all errors before marking a FEAT complete.",
+  "snapshot_or_generated_files": null,
+  "environment_constraints": "No Firebase Storage — it requires billing. No Google Maps API — use Nominatim only. No Cloud Functions. No Admin SDK in frontend code. The `import.meta.env` Vite vars are NOT available in Node scripts (scripts/ folder) — inline config values there instead.",
+  "contribution_requirements": "From AGENTS.md: no any types; all Firestore access through src/services/firestore.ts or hooks only; no direct firebase imports in page components; font-display on h1-h3; font-sans on all other text; no emojis; no inline styles; Tailwind only; rounded-lg on buttons always; no border on card containers (shadow-sm only); React Hook Form + Zod for all forms; internal navigation via Link or navigate() never plain <a href>; import auth/db only from @/services/firebase; import signOut only from @/services/auth.",
+  "key_patterns": "Button component at src/components/common/Button.tsx currently uses plain <a href> — must be changed to react-router-dom Link. Navbar at src/components/layout/Navbar.tsx imports signOut directly from firebase/auth — must import from @/services/auth. All four target pages (Register, Login, Dashboard, EditProfile) are placeholder stubs — full replacements. The Avatar component (src/components/common/Avatar.tsx) is initials-only (no photo support). useAuth hook at src/hooks/useAuth.ts is nearly complete — only remove its inline signOut export. authStore at src/store/authStore.ts has shape {user, loading, error, setUser, setLoading, setError, clearError}. firebase.ts exports `auth` and `db` — also needs to export `firebaseConfig` for the seed script.",
+  "relevant_files": [
+    "src/services/firebase.ts",
+    "src/store/authStore.ts",
+    "src/hooks/useAuth.ts",
+    "src/types/provider.ts",
+    "src/components/common/Button.tsx",
+    "src/components/common/Input.tsx",
+    "src/components/common/Textarea.tsx",
+    "src/components/common/Avatar.tsx",
+    "src/components/common/LocationInput.tsx",
+    "src/components/layout/Navbar.tsx",
+    "src/App.tsx",
+    "package.json",
+    "vite.config.ts",
+    "docs/DESIGN_SYSTEM.md",
+    "docs/AGENTS.md"
+  ],
+  "directory_structure": "src/services/ — firebase init, auth helpers, firestore helpers; src/types/ — TypeScript interfaces (provider.ts exists, category.ts to create); src/hooks/ — useAuth.ts (exists, needs minor fix), useCategories.ts (to create); src/utils/ — geocoding.ts (to create); src/components/common/ — Button, Input, Textarea, Avatar, LocationInput (all exist; Button and LocationInput need changes); src/components/provider/ — SkillPicker, AvailabilityToggle (to create); src/components/layout/ — Navbar (exists, needs fixes); src/pages/ — all target pages exist as stubs; scripts/ — seedCategories.ts to create; firestore.rules — does not exist yet, must be created at project root."
+}

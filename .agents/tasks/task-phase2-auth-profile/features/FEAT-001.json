@@ -1,0 +1,40 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Services, types, utilities, and security rules layer — all pure logic with no UI. Creates the foundation that FEAT-002 UI components depend on. Independent of FEAT-002 (FEAT-002 depends on this; this does not depend on FEAT-002).",
+  "status": "completed",
+  "steps": [
+    "1. Create src/types/category.ts — export interface Category { id: string; label: string; icon: string; isActive: boolean; sortOrder: number; }",
+
+    "2. Create src/utils/geocoding.ts — export async function geocodeLocation(query: string): Promise<Array<{ display_name: string; lat: string; lon: string }>>. Fetch https://nominatim.openstreetmap.org/search?q={encodeURIComponent(query)}&format=json&limit=5&countrycodes=ug,ke,tz,rw,et with header User-Agent: 'Djema/1.0'. Return parsed JSON array typed as above. On fetch error throw new Error('Geocoding failed: ' + message). No any types.",
+
+    "3. Create src/services/auth.ts — import auth from @/services/firebase; import GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, UserCredential from firebase/auth. Export: registerWithEmail(email, password): Promise<UserCredential>; signInWithEmail(email, password): Promise<UserCredential>; signInWithGoogle(): Promise<UserCredential> using GoogleAuthProvider + signInWithPopup; signOut(): Promise<void> calling firebaseSignOut(auth). No default export. No other file imports directly from firebase/auth for signOut.",
+
+    "4. Create src/services/firestore.ts — import db from @/services/firebase. Import GeoPoint, serverTimestamp, Timestamp, doc, setDoc, updateDoc, getDoc, onSnapshot, collection, getDocs, query, orderBy, Unsubscribe from firebase/firestore. Import Provider from @/types/provider. Import Category from @/types/category. Export: createProvider(uid: string, data: Omit<Provider, 'uid'|'createdAt'|'updatedAt'|'skillEmbedding'>): Promise<void> — setDoc on providers/{uid}, add uid, skillEmbedding: null, createdAt: serverTimestamp(), updatedAt: serverTimestamp(); updateProvider(uid: string, data: Partial<Provider>): Promise<void> — updateDoc on providers/{uid}, merge updatedAt: serverTimestamp(); getProvider(uid: string): Promise<Provider | null> — getDoc, return null if !snap.exists(), cast snap.data() as Provider; subscribeToProvider(uid: string, callback: (p: Provider | null) => void): Unsubscribe — onSnapshot on providers/{uid}; getCategories(): Promise<Category[]> — getDocs with query(collection(db,'categories'), orderBy('sortOrder','asc')), map to Category[]; subscribeToCategories(callback: (cats: Category[]) => void): Unsubscribe — onSnapshot on categories collection. On any Firestore error throw new Error with descriptive message.",
+
+    "5. Create src/hooks/useCategories.ts — import subscribeToCategories from @/services/firestore. Import Category from @/types/category. Use useState<Category[]>([]) and useState<boolean>(true). In useEffect subscribe and set categories + loading=false, return unsubscribe. Export function useCategories(): { categories: Category[]; loading: boolean }.",
+
+    "6. Update src/hooks/useAuth.ts — remove the inline signOut function and its import of signOut from firebase/auth. The hook should only subscribe onAuthStateChanged and return {user, loading, isAuthenticated}. Keep import of auth from @/services/firebase and onAuthStateChanged from firebase/auth. Callers that need signOut must import from @/services/auth directly.",
+
+    "7. Update src/services/firebase.ts — add export of the firebaseConfig object so the seed script can import it. Add: export const firebaseConfig = { ... } before initializeApp, and pass firebaseConfig to initializeApp. Keep all existing exports (auth, db, analytics) unchanged.",
+
+    "8. Create scripts/seedCategories.ts — NOTE: import.meta.env is NOT available in Node.js scripts. Inline the Firebase config object directly in this file (the client-side config is public and safe to commit). Import initializeApp from firebase/app; getFirestore, doc, setDoc from firebase/firestore. Seed all 16 categories using setDoc with { merge: true } so it is idempotent: plumber/Plumber/Wrench/1, electrician/Electrician/Zap/2, carpenter/Carpenter/Hammer/3, painter/Painter/Paintbrush/4, cleaner/Cleaner House Help/Sparkles/5, mechanic/Mechanic/Settings/6, tailor/Tailor Seamstress/Scissors/7, mason/Mason Builder/HardHat/8, welder/Welder/Flame/9, driver/Driver Boda Boda/Car/10, gardener/Gardener/Leaf/11, it_technician/IT Computer Repair/Monitor/12, beautician/Beautician Hairdresser/Smile/13, tutor/Tutor Teacher/BookOpen/14, photographer/Photographer/Camera/15, other/Other/Star/16. All isActive: true. Run with: npx tsx scripts/seedCategories.ts",
+
+    "9. Create firestore.rules at project root — rules_version='2', with helpers isAuth(), isOwner(uid), isAdmin(). categories: read=true, write=isAdmin(). providers/{uid}: read=true, create=isOwner(uid), update=isOwner(uid), delete=isOwner(uid). requests/{requestId}: read=true, create=true, update=only if diff affectedKeys hasOnly(['isPublic','requesterWhatsapp','requesterEmail','status','updatedAt']), delete=false. matches/{requestId}: read=isAuth(), write=isAuth() (client writes after TF.js matching since no Cloud Functions)."
+  ],
+  "acceptance_criteria": [
+    "npx tsc --noEmit exits 0 with no errors after all files are created",
+    "npx vite build exits 0 — the build must include the new types and services without error",
+    "src/types/category.ts exports Category interface with all 5 fields",
+    "src/services/auth.ts exports registerWithEmail, signInWithEmail, signInWithGoogle, signOut — no any types",
+    "src/services/firestore.ts exports createProvider, updateProvider, getProvider, subscribeToProvider, getCategories, subscribeToCategories — no any types, GeoPoint used for location, serverTimestamp() used for timestamps",
+    "src/hooks/useAuth.ts no longer exports a signOut function",
+    "firestore.rules file exists at project root with all 4 collection rules"
+  ],
+  "verification": [
+    "cd 'c:\\Users\\CHERUBIN\\Documents\\CHAM\\CHAM HACKATHON\\Djema' && npx tsc --noEmit",
+    "cd 'c:\\Users\\CHERUBIN\\Documents\\CHAM\\CHAM HACKATHON\\Djema' && npx vite build"
+  ],
+  "blocked_reason": null,
+  "findings": "Exported functions for FEAT-002 to consume:\n\n• src/services/auth.ts — registerWithEmail(email,password):Promise<UserCredential>; signInWithEmail(email,password):Promise<UserCredential>; signInWithGoogle():Promise<UserCredential>; signOut():Promise<void>. No default export.\n\n• src/services/firestore.ts — createProvider(uid,data):Promise<void>; updateProvider(uid,data):Promise<void>; getProvider(uid):Promise<Provider|null>; subscribeToProvider(uid,cb):Unsubscribe; getCategories():Promise<Category[]>; subscribeToCategories(cb):Unsubscribe. Also re-exports GeoPoint from firebase/firestore so pages can do `import { GeoPoint } from '@/services/firestore'` without touching firebase/firestore directly.\n\n• src/hooks/useAuth.ts — now returns {user,loading,isAuthenticated} only (signOut removed). Callers import signOut from @/services/auth.\n\n• src/hooks/useCategories.ts — returns {categories:Category[],loading:boolean}.\n\n• src/utils/geocoding.ts — geocodeLocation(query):Promise<NominatimResult[]> where NominatimResult={display_name,lat,lon} (all strings). Also exports the NominatimResult interface.\n\n• src/types/category.ts — Category interface: {id,label,icon,isActive,sortOrder}.\n\n• firestore.rules — live at project root. All 4 collection rules in place.\n\n• scripts/seedCategories.ts — run with `npx tsx scripts/seedCategories.ts` to seed 16 categories into Firestore.\n\nDecisions: GeoPoint is re-exported from firestore.ts so pages never import directly from firebase/firestore. The Navbar still imports signOut from firebase/auth — that fix belongs to FEAT-002 (Navbar.tsx step 11 in phase2-plan)."
+}

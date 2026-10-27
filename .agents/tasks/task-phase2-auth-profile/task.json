@@ -1,0 +1,7 @@
+{
+  "task_id": "task-phase2-auth-profile",
+  "task_description": "Phase 2: Provider Auth & Profile — implement Firebase auth services, Firestore CRUD helpers, Nominatim geocoding, all UI components (SkillPicker, AvailabilityToggle, LocationInput), and all pages (Register, Login, Dashboard, EditProfile), plus Firestore security rules and category seed script.",
+  "status": "completed",
+  "feature_order": ["FEAT-001", "FEAT-002"],
+  "blocked_reason": null
+}
