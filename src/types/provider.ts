@@ -9,7 +9,7 @@ export interface Provider {
   skills: string[];
   location: GeoPoint;
   locationName: string;
-  profilePhotoUrl: string | null;
+  // profilePhotoUrl removed — Firebase Storage requires billing (not available on Spark plan)
   available: boolean;
   isActive: boolean;
   skillEmbedding: number[] | null;
@@ -26,5 +26,4 @@ export type ProviderFormValues = {
   locationName: string;
   lat: number;
   lng: number;
-  profilePhotoUrl?: string;
 };

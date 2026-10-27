@@ -10,7 +10,7 @@ export interface ServiceRequest {
   location: GeoPoint;
   locationName: string;
   estimatedHours: number;
-  photoUrl: string | null;
+  // photoUrl removed — Firebase Storage requires billing (not available on Spark plan)
   status: RequestStatus;
   isPublic: boolean;
   requesterWhatsapp: string | null;
@@ -29,5 +29,4 @@ export type RequestFormValues = {
   lat: number;
   lng: number;
   estimatedHours: number;
-  photoFile?: File;
 };

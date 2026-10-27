@@ -7,4 +7,5 @@ export { ToastProvider, useToast } from './ToastProvider';
 export { Skeleton } from './Skeleton';
 export { ProtectedRoute } from './ProtectedRoute';
 export { LocationInput } from './LocationInput';
+export { Avatar } from './Avatar';
 export type { ToastType, ToastMessage } from './Toast';
