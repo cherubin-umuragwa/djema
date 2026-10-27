@@ -55,8 +55,6 @@ export function PostRequestPage() {
         location,
         locationName: values.locationName,
         estimatedHours: values.estimatedHours,
-        status: 'pending',
-        isPublic: false,
         requesterWhatsapp: null,
         requesterEmail: null,
       });

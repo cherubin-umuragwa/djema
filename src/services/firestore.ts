@@ -123,7 +123,7 @@ export function subscribeToCategories(
 }
 
 export async function createRequest(
-  data: Omit<ServiceRequest, 'id' | 'createdAt' | 'updatedAt' | 'expiresAt' | 'matchCount' | 'descriptionEmbedding'>,
+  data: Omit<ServiceRequest, 'id' | 'createdAt' | 'updatedAt' | 'expiresAt' | 'matchCount' | 'descriptionEmbedding' | 'status' | 'isPublic'>,
 ): Promise<string> {
   try {
     const docRef = await addDoc(collection(db, 'requests'), {

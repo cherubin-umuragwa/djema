@@ -40,10 +40,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // matches — client writes after TF.js matching; read is public so guests can see their results
+    // matches — client writes after TF.js matching; read is public so guests can see their results.
+    // Guards:
+    //   1. Written requestId field must match the document path (prevents cross-document poisoning).
+    //   2. Cannot overwrite a document already in 'completed' status (prevents suppressing results).
     match /matches/{requestId} {
       allow read: if true;
-      allow write: if request.resource.data.keys().hasAll(['requestId', 'status', 'results', 'processedAt', 'createdAt']);
+      allow write: if request.resource.data.keys().hasAll(['requestId', 'status', 'results', 'processedAt', 'createdAt'])
+        && request.resource.data.requestId == requestId
+        && (!exists(/databases/$(database)/documents/matches/$(requestId))
+            || resource.data.status != 'completed');
     }
   }
 }
