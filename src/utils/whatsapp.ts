@@ -19,3 +19,11 @@ export function buildRequesterToProviderMessage(
 ): string {
   return `Hi ${providerName}, I found you on Djema. I need help with ${serviceType}. Are you available?`;
 }
+
+export function providerContactMessage(serviceType: string, locationName: string): string {
+  return `Hi, I saw your request for a ${serviceType} on Djema in ${locationName}. I can help! Can we discuss?`;
+}
+
+export function requesterContactMessage(providerName: string, serviceType: string, locationName: string): string {
+  return `Hi ${providerName}, I found you on Djema. I need a ${serviceType} in ${locationName}. Are you available?`;
+}

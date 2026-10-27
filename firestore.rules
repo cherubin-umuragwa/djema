@@ -29,22 +29,21 @@ service cloud.firestore {
     }
 
     // Service requests: public-read and public-create.
-    // Updates restricted to a safe subset of fields.
+    // Updates restricted to a safe subset of fields (including matchCount).
     // Deletes are forbidden.
     match /requests/{requestId} {
       allow read: if true;
       allow create: if true;
       allow update: if
         request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['isPublic', 'requesterWhatsapp', 'requesterEmail', 'status', 'updatedAt']);
+          .hasOnly(['isPublic', 'requesterWhatsapp', 'requesterEmail', 'status', 'updatedAt', 'matchCount']);
       allow delete: if false;
     }
 
-    // Match results written by the client after TF.js matching (no Cloud Functions).
-    // Only the provider whose uid matches providerUid in the document may write.
+    // matches — client writes after TF.js matching; read is public so guests can see their results
     match /matches/{requestId} {
-      allow read: if isAuth();
-      allow write: if isAuth() && request.resource.data.providerUid == request.auth.uid;
+      allow read: if true;
+      allow write: if request.resource.data.keys().hasAll(['requestId', 'status', 'results', 'processedAt', 'createdAt']);
     }
   }
 }
