@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import type { FirebaseError } from 'firebase/app';
-import { GeoPoint } from 'firebase/firestore';
 import { Input } from '@/components/common/Input';
 import { Textarea } from '@/components/common/Textarea';
 import { Button } from '@/components/common/Button';
@@ -14,7 +13,7 @@ import { SkillPicker } from '@/components/provider/SkillPicker';
 import { useCategories } from '@/hooks/useCategories';
 import { useToast } from '@/components/common/ToastProvider';
 import { registerWithEmail, signInWithGoogle } from '@/services/auth';
-import { createProvider } from '@/services/firestore';
+import { createProvider, GeoPoint } from '@/services/firestore';
 import { useAuth } from '@/hooks/useAuth';
 
 // ─── Step 1 schema ──────────────────────────────────────────────────────────

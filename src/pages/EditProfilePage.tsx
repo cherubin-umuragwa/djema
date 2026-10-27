@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AlertCircle } from 'lucide-react';
-import { GeoPoint } from 'firebase/firestore';
 import { PageWrapper } from '@/components/layout/PageWrapper';
 import { Input } from '@/components/common/Input';
 import { Textarea } from '@/components/common/Textarea';
@@ -14,7 +13,7 @@ import { SkillPicker } from '@/components/provider/SkillPicker';
 import { useCategories } from '@/hooks/useCategories';
 import { useToast } from '@/components/common/ToastProvider';
 import { useAuth } from '@/hooks/useAuth';
-import { getProvider, updateProvider } from '@/services/firestore';
+import { getProvider, updateProvider, GeoPoint } from '@/services/firestore';
 
 const profileSchema = z.object({
   displayName: z.string().min(2, 'Name must be at least 2 characters'),
