@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
-import type { FirebaseError } from 'firebase/app';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { signInWithEmail, signInWithGoogle } from '@/services/auth';
@@ -46,8 +45,9 @@ export function LoginPage() {
       await signInWithEmail(data.email, data.password);
       navigate('/dashboard');
     } catch (err) {
-      const fbErr = err as FirebaseError;
-      setFormError(mapAuthError(fbErr.code ?? '', fbErr.message));
+      const code = err instanceof Error && 'code' in err ? (err as { code: string }).code : '';
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setFormError(mapAuthError(code, message));
     }
   }
 
@@ -57,8 +57,9 @@ export function LoginPage() {
       await signInWithGoogle();
       navigate('/dashboard');
     } catch (err) {
-      const fbErr = err as FirebaseError;
-      setFormError(mapAuthError(fbErr.code ?? '', fbErr.message));
+      const code = err instanceof Error && 'code' in err ? (err as { code: string }).code : '';
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setFormError(mapAuthError(code, message));
     }
   }
 

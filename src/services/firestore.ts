@@ -66,6 +66,7 @@ export async function getProvider(uid: string): Promise<Provider | null> {
 export function subscribeToProvider(
   uid: string,
   callback: (p: Provider | null) => void,
+  onError?: (err: Error) => void,
 ): Unsubscribe {
   return onSnapshot(
     doc(db, 'providers', uid),
@@ -73,7 +74,12 @@ export function subscribeToProvider(
       callback(snap.exists() ? (snap.data() as Provider) : null);
     },
     (err) => {
-      throw new Error('Provider subscription error: ' + err.message);
+      console.error('Provider subscription error:', err.message);
+      if (onError) {
+        onError(err);
+      } else {
+        callback(null);
+      }
     },
   );
 }
@@ -91,6 +97,7 @@ export async function getCategories(): Promise<Category[]> {
 
 export function subscribeToCategories(
   callback: (cats: Category[]) => void,
+  onError?: (err: Error) => void,
 ): Unsubscribe {
   const q = query(collection(db, 'categories'), orderBy('sortOrder', 'asc'));
   return onSnapshot(
@@ -99,7 +106,12 @@ export function subscribeToCategories(
       callback(snap.docs.map((d) => d.data() as Category));
     },
     (err) => {
-      throw new Error('Categories subscription error: ' + err.message);
+      console.error('Categories subscription error:', err.message);
+      if (onError) {
+        onError(err);
+      } else {
+        callback([]);
+      }
     },
   );
 }

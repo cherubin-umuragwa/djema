@@ -4,7 +4,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
-import type { FirebaseError } from 'firebase/app';
 import { Input } from '@/components/common/Input';
 import { Textarea } from '@/components/common/Textarea';
 import { Button } from '@/components/common/Button';
@@ -89,7 +88,7 @@ export function RegisterPage() {
       setUid(cred.user.uid);
       setStep(2);
     } catch (err) {
-      const code = (err as FirebaseError).code ?? '';
+      const code = err instanceof Error && 'code' in err ? (err as { code: string }).code : '';
       setFormError(mapAuthError(code));
     }
   }
@@ -101,7 +100,7 @@ export function RegisterPage() {
       setUid(cred.user.uid);
       setStep(2);
     } catch (err) {
-      const code = (err as FirebaseError).code ?? '';
+      const code = err instanceof Error && 'code' in err ? (err as { code: string }).code : '';
       setFormError(mapAuthError(code));
     }
   }

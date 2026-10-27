@@ -41,9 +41,10 @@ service cloud.firestore {
     }
 
     // Match results written by the client after TF.js matching (no Cloud Functions).
+    // Only the provider whose uid matches providerUid in the document may write.
     match /matches/{requestId} {
       allow read: if isAuth();
-      allow write: if isAuth();
+      allow write: if isAuth() && request.resource.data.providerUid == request.auth.uid;
     }
   }
 }
