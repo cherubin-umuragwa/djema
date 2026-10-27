@@ -58,10 +58,12 @@ export function MatchesPage() {
 
     const sessionToken = getSessionToken();
     let matchUnsub: (() => void) | undefined;
+    // Narrow once — requestId is confirmed non-null by the early return above
+    const safeRequestId = requestId;
 
     async function init() {
       try {
-        const req = await getRequest(requestId!, sessionToken);
+        const req = await getRequest(safeRequestId, sessionToken);
         if (!req) {
           setPageState('error');
           setErrorMessage('Request not found or access denied.');
@@ -71,13 +73,11 @@ export function MatchesPage() {
 
         // Subscribe to the match document first — if it already exists (e.g. back navigation), use it
         matchUnsub = subscribeToMatch(
-          requestId!,
+          safeRequestId,
           async (match: MatchDocument | null) => {
             if (match && match.status === 'completed') {
               setResults(match.results);
               setPageState('results');
-              // If providerMap is not yet populated (e.g. back navigation to existing match),
-              // fetch providers so ProviderCard can resolve contact details.
               setProviderMap(prev => {
                 if (prev.size === 0) {
                   getAvailableProviders().then(providers => {
@@ -92,26 +92,23 @@ export function MatchesPage() {
               setPageState('no_matches');
               return;
             }
-            // No completed match yet — run the pipeline if we haven't started
             if (!matchingStartedRef.current) {
               matchingStartedRef.current = true;
               setPageState('matching');
               try {
                 const providers = await getAvailableProviders();
                 const matchResults = await runMatching(req, providers);
-                // Build a lookup map: providerId → Provider for contact details at display time.
-                // Contact details are NOT stored in the match document (which is publicly readable).
                 const map = new Map(providers.map(p => [p.uid, p]));
                 setProviderMap(map);
                 const matchStatus = matchResults.length > 0 ? 'completed' : 'no_matches';
-                await createMatch(requestId!, {
-                  requestId: requestId!,
+                await createMatch(safeRequestId, {
+                  requestId: safeRequestId,
                   sessionToken: req.sessionToken,
                   status: matchStatus,
                   results: matchResults,
                   processedAt: Timestamp.now(),
                 });
-                await updateRequest(requestId!, {
+                await updateRequest(safeRequestId, {
                   matchCount: matchResults.length,
                 });
                 if (matchResults.length > 0) {
@@ -148,13 +145,19 @@ export function MatchesPage() {
 
   async function onPublicPost(values: PublicFormValues) {
     if (!requestId) return;
-    await updateRequest(requestId, {
-      status: 'open',
-      isPublic: true,
-      requesterWhatsapp: values.whatsapp,
-      requesterEmail: values.email ?? null,
-    });
-    setPageState('posted');
+    try {
+      await updateRequest(requestId, {
+        status: 'open',
+        isPublic: true,
+        requesterWhatsapp: values.whatsapp,
+        requesterEmail: values.email ?? null,
+      });
+      setPageState('posted');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to post your request publicly.';
+      setErrorMessage(msg);
+      setPageState('error');
+    }
   }
 
   if (pageState === 'loading' || pageState === 'matching') {

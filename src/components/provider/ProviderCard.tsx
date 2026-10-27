@@ -51,9 +51,10 @@ export function ProviderCard({ result, provider, serviceType, requestLocationNam
       <div className="mt-4">
         <span className="font-sans text-xs text-slate-500">Match quality</span>
         <div className="mt-1 h-1.5 rounded-full bg-slate-200 overflow-hidden">
+          {/* Width is dynamic — only safe use of inline style in the codebase, no design-system class covers arbitrary percentages */}
           <div
             className="h-full bg-green-500 rounded-full transition-all"
-            style={{ width: `${result.finalScore * 100}%` }}
+            style={{ width: `${(result.finalScore * 100).toFixed(0)}%` }}
           />
         </div>
       </div>
