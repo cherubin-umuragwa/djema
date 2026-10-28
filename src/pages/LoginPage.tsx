@@ -64,7 +64,7 @@ export function LoginPage() {
   }
 
   return (
-    <main className="max-w-sm mx-auto py-12 px-4 flex flex-col gap-6">
+    <main className="max-w-sm mx-auto mt-16 py-12 px-4 flex flex-col gap-6">
       <div>
         <h1 className="font-display text-2xl font-bold text-slate-900">Welcome back</h1>
         <p className="font-sans text-sm text-slate-600 mt-2">

@@ -26,7 +26,7 @@ export function Footer() {
           </Link>
         </div>
         <p className="font-sans text-xs text-slate-400">
-          2026 Djema &middot; Built for PreDevFest Hackathon &middot; Kampala, Uganda
+          2026 Djema &middot; Kampala, Uganda
         </p>
       </div>
     </footer>
