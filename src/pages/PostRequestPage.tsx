@@ -101,7 +101,6 @@ export function PostRequestPage() {
                 maxLength={1000}
                 required
                 error={errors.description?.message}
-                value={description}
                 {...field}
               />
             )}
