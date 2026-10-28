@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Avatar } from '@/components/common/Avatar';
@@ -8,19 +8,25 @@ import { signOut } from '@/services/auth';
 
 export function Navbar() {
   const { user, isAuthenticated } = useAuth();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Switch to solid white once the user scrolls past the hero (~80vh)
+  // Glass effect only on homepage — switch to solid white after scrolling past hero
   useEffect(() => {
+    if (!isHomePage) {
+      setScrolled(true);
+      return;
+    }
     function onScroll() {
       setScrolled(window.scrollY > window.innerHeight * 0.75);
     }
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // run once on mount in case page is already scrolled
+    onScroll();
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [isHomePage]);
 
   async function handleSignOut() {
     await signOut();
