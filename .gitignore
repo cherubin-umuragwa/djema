@@ -8,3 +8,4 @@ functions/.env
 *.local
 *.json.key
 service-account*.json
+.agents/
