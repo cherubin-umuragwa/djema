@@ -49,7 +49,7 @@ export function HomePage() {
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       {/* Centered — the one section where center alignment is intentional */}
-      <section className="relative pt-48 pb-36 px-4 text-center overflow-hidden">
+      <section className="relative pt-56 pb-44 px-4 text-center overflow-hidden">
         {/* Background image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -61,27 +61,12 @@ export function HomePage() {
 
         {/* Content sits above the overlay */}
         <div className="relative max-w-3xl mx-auto">
-          <p className="font-sans text-sm font-medium text-green-400 uppercase tracking-widest mb-4">
-            Kampala, Uganda
-          </p>
           <h1 className="font-display font-bold text-5xl md:text-6xl text-white leading-tight">
             Find skilled workers.<br />Get work done today.
           </h1>
           <p className="font-sans text-lg text-slate-300 mt-6 max-w-xl mx-auto leading-relaxed">
             Djema connects you with plumbers, electricians, carpenters, and hundreds of other skilled workers near you in Kampala — no bank card, no CV, no waiting.
           </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button variant="primary" href="/post-request" size="lg">
-              Post a Request
-            </Button>
-            <Link
-              to="/register"
-              className="font-sans font-medium text-sm text-slate-300 hover:text-white flex items-center gap-1 transition-colors"
-            >
-              Are you a provider? Join here
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
         </div>
       </section>
 
