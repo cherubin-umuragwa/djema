@@ -17,93 +17,109 @@ export function Navbar() {
   }
 
   return (
-    <nav
-      className="fixed top-0 w-full h-16 bg-white border-b border-slate-200 shadow-sm z-30"
-      role="navigation"
-      aria-label="Main navigation"
-    >
-      <div className="max-w-5xl mx-auto px-4 h-full flex items-center justify-between">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="font-display font-bold text-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-green-500 rounded"
-        >
-          Djema
-        </Link>
+    <>
+      {/* Floating glassmorphism navbar */}
+      <nav
+        className="fixed top-0 left-0 right-0 z-30 px-4 pt-4"
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="h-14 flex items-center justify-between px-5 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 shadow-sm">
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-2">
-          {isAuthenticated ? (
-            <>
-              <Button variant="ghost" href="/board">Browse Requests</Button>
-              <div className="relative">
-                <button
-                  onClick={() => setDropdownOpen((o) => !o)}
-                  className="w-9 h-9 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                  aria-label="Account menu"
-                  aria-expanded={dropdownOpen}
-                >
-                  <Avatar name={user?.displayName ?? 'Provider'} size="sm" />
-                </button>
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-md border border-slate-100 py-1 z-40">
-                    <Link
-                      to="/dashboard"
-                      className="block px-4 py-2 font-sans text-sm text-slate-700 hover:bg-slate-50"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      to="/profile/edit"
-                      className="block px-4 py-2 font-sans text-sm text-slate-700 hover:bg-slate-50"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      Edit Profile
-                    </Link>
+            {/* Logo */}
+            <Link
+              to="/"
+              className="font-display font-bold text-xl text-white focus:outline-none focus:ring-2 focus:ring-white/50 rounded"
+            >
+              Djema
+            </Link>
+
+            {/* Desktop nav */}
+            <div className="hidden md:flex items-center gap-2">
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/board"
+                    className="font-sans text-sm font-medium text-white/90 hover:text-white px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    Browse Requests
+                  </Link>
+                  <div className="relative">
                     <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2 font-sans text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                      onClick={() => setDropdownOpen((o) => !o)}
+                      className="w-9 h-9 rounded-full focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-1"
+                      aria-label="Account menu"
+                      aria-expanded={dropdownOpen}
                     >
-                      <LogOut size={14} aria-hidden="true" />
-                      Sign Out
+                      <Avatar name={user?.displayName ?? 'Provider'} size="sm" />
                     </button>
+                    {dropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-md border border-slate-100 py-1 z-40">
+                        <Link
+                          to="/dashboard"
+                          className="block px-4 py-2 font-sans text-sm text-slate-700 hover:bg-slate-50"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <Link
+                          to="/profile/edit"
+                          className="block px-4 py-2 font-sans text-sm text-slate-700 hover:bg-slate-50"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          Edit Profile
+                        </Link>
+                        <button
+                          onClick={handleSignOut}
+                          className="w-full text-left px-4 py-2 font-sans text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          <LogOut size={14} aria-hidden="true" />
+                          Sign Out
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </>
-          ) : (
-            <>
-              <Button variant="primary" href="/post-request">Post a Request</Button>
-              <Button variant="ghost" href="/login">Sign in as Provider</Button>
-            </>
-          )}
-        </div>
+                </>
+              ) : (
+                <>
+                  <Button variant="primary" href="/post-request">Post a Request</Button>
+                  <Link
+                    to="/login"
+                    className="font-sans text-sm font-medium text-white/90 hover:text-white px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                  >
+                    Sign in as Provider
+                  </Link>
+                </>
+              )}
+            </div>
 
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-          onClick={() => setMobileOpen((o) => !o)}
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
-        </button>
-      </div>
+            {/* Mobile menu button */}
+            <button
+              className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50"
+              onClick={() => setMobileOpen((o) => !o)}
+              aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+            </button>
+
+          </div>
+        </div>
+      </nav>
 
       {/* Mobile slide-over — backdrop + panel */}
       {mobileOpen && (
         <>
-          {/* Backdrop — tap anywhere to close */}
+          {/* Backdrop */}
           <div
-            className="md:hidden fixed inset-0 bg-black/40 z-40"
+            className="fixed inset-0 bg-black/40 z-40 md:hidden"
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
 
           {/* Panel */}
-          <div className="md:hidden fixed inset-y-0 right-0 w-72 bg-white shadow-xl z-50 flex flex-col">
-            {/* Panel header with close button */}
+          <div className="fixed inset-y-0 right-0 w-72 bg-white shadow-xl z-50 flex flex-col md:hidden">
             <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200">
               <span className="font-display font-bold text-lg text-slate-900">Menu</span>
               <button
@@ -115,7 +131,6 @@ export function Navbar() {
               </button>
             </div>
 
-            {/* Nav links */}
             <div className="px-4 py-6 flex flex-col gap-3">
               {isAuthenticated ? (
                 <>
@@ -162,6 +177,6 @@ export function Navbar() {
           </div>
         </>
       )}
-    </nav>
+    </>
   );
 }
