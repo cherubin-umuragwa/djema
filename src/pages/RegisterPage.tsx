@@ -149,6 +149,7 @@ export function RegisterPage() {
       {step === 1 ? (
         <>
           <div>
+            <p className="font-sans text-sm text-slate-500 text-right mb-2">Step 1 of 2</p>
             <h1 className="font-display text-2xl font-bold text-slate-900">
               Create your provider account
             </h1>

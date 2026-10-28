@@ -32,9 +32,19 @@ export async function runMatching(
 ): Promise<MatchResult[]> {
   if (providers.length === 0) return [];
 
+  // 1. Hard pre-filter: only providers whose skills[] contains serviceType (case-insensitive)
+  const filteredProviders = providers.filter(p =>
+    p.skills.some(s => s.toLowerCase() === request.serviceType.toLowerCase()),
+  );
+
+  // 2. If hard-filtered set is non-empty, use it (threshold 0.4 — skill already confirmed).
+  //    If empty, fall through to soft path using all providers (threshold raised to 0.55).
+  const candidateProviders = filteredProviders.length > 0 ? filteredProviders : providers;
+  const threshold = filteredProviders.length > 0 ? 0.4 : 0.55;
+
   const model = await loadModel();
   const requestText = `${request.serviceType} ${request.description}`;
-  const providerTexts = providers.map(p => `${p.skills.join(' ')} ${p.bio}`);
+  const providerTexts = candidateProviders.map(p => `${p.skills.join(' ')} ${p.bio}`);
   const allTexts = [requestText, ...providerTexts];
 
   const embeddings = await model.embed(allTexts);
@@ -44,8 +54,8 @@ export async function runMatching(
   const requestEmbedding = embeddingArray[0];
   const results: MatchResult[] = [];
 
-  for (let i = 0; i < providers.length; i++) {
-    const provider = providers[i];
+  for (let i = 0; i < candidateProviders.length; i++) {
+    const provider = candidateProviders[i];
     const providerEmbedding = embeddingArray[i + 1];
     const skillScore = cosineSimilarity(requestEmbedding, providerEmbedding);
     const distanceKm = haversineKm(
@@ -57,7 +67,7 @@ export async function runMatching(
     const proxScore = proximityScore(distanceKm);
     const finalScore = skillScore * 0.6 + proxScore * 0.4;
 
-    if (finalScore >= 0.4) {
+    if (finalScore >= threshold) {
       results.push({
         providerId: provider.uid,
         displayName: provider.displayName,
