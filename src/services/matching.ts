@@ -32,15 +32,16 @@ export async function runMatching(
 ): Promise<MatchResult[]> {
   if (providers.length === 0) return [];
 
-  // 1. Hard pre-filter: only providers whose skills[] contains serviceType (case-insensitive)
-  const filteredProviders = providers.filter(p =>
+  // Hard pre-filter: only providers whose skills[] contains the requested serviceType.
+  // If no provider has that skill, return empty immediately — show "no matches found".
+  // There is no soft fallback: suggesting wrong-skill providers creates a bad experience.
+  const candidateProviders = providers.filter(p =>
     p.skills.some(s => s.toLowerCase() === request.serviceType.toLowerCase()),
   );
 
-  // 2. If hard-filtered set is non-empty, use it (threshold 0.4 — skill already confirmed).
-  //    If empty, fall through to soft path using all providers (threshold raised to 0.55).
-  const candidateProviders = filteredProviders.length > 0 ? filteredProviders : providers;
-  const threshold = filteredProviders.length > 0 ? 0.4 : 0.55;
+  if (candidateProviders.length === 0) return [];
+
+  const threshold = 0.35; // threshold within the already skill-matched set
 
   const model = await loadModel();
   const requestText = `${request.serviceType} ${request.description}`;
