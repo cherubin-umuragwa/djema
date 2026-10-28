@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ToastProvider } from '@/components/common/ToastProvider';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
@@ -20,35 +20,48 @@ export default function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/post-request" element={<PostRequestPage />} />
-          <Route path="/matches/:requestId" element={<MatchesPage />} />
-          <Route path="/board" element={<BoardPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile/edit"
-            element={
-              <ProtectedRoute>
-                <EditProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/providers/:id" element={<ProviderProfilePage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-        <Footer />
+        <AppShell />
       </ToastProvider>
     </BrowserRouter>
+  );
+}
+
+function AppShell() {
+  const location = useLocation();
+  // Dashboard routes get their own layout — no global navbar/footer
+  const isDashboard = location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/profile');
+
+  return (
+    <>
+      {!isDashboard && <Navbar />}
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/post-request" element={<PostRequestPage />} />
+        <Route path="/matches/:requestId" element={<MatchesPage />} />
+        <Route path="/board" element={<BoardPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile/edit"
+          element={
+            <ProtectedRoute>
+              <EditProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/providers/:id" element={<ProviderProfilePage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      {!isDashboard && <Footer />}
+    </>
   );
 }
