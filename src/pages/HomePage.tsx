@@ -43,37 +43,31 @@ const STEPS = [
   },
 ];
 
-// ─── Service categories grid ────────────────────────────────────────────────
-const CATEGORIES = [
-  { label: 'Plumber', Icon: Wrench, href: '/post-request?service=plumber' },
-  { label: 'Electrician', Icon: Zap, href: '/post-request?service=electrician' },
-  { label: 'Carpenter', Icon: Hammer, href: '/post-request?service=carpenter' },
-  { label: 'Painter', Icon: Paintbrush, href: '/post-request?service=painter' },
-  { label: 'Mechanic', Icon: Settings, href: '/post-request?service=mechanic' },
-  { label: 'Tailor', Icon: Scissors, href: '/post-request?service=tailor' },
-  { label: 'Gardener', Icon: Leaf, href: '/post-request?service=gardener' },
-  { label: 'IT Repair', Icon: Monitor, href: '/post-request?service=it_technician' },
-  { label: 'Tutor', Icon: BookOpen, href: '/post-request?service=tutor' },
-  { label: 'Photographer', Icon: Camera, href: '/post-request?service=photographer' },
-  { label: 'Driver', Icon: Car, href: '/post-request?service=driver' },
-  { label: 'More', Icon: Users, href: '/post-request' },
-];
-
 export function HomePage() {
   return (
     <div className="min-h-screen bg-white">
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       {/* Centered — the one section where center alignment is intentional */}
-      <section className="pt-32 pb-20 px-4 text-center bg-white">
-        <div className="max-w-3xl mx-auto">
-          <p className="font-sans text-sm font-medium text-green-600 uppercase tracking-widest mb-4">
+      <section className="relative pt-48 pb-36 px-4 text-center overflow-hidden">
+        {/* Background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/images/hero1.jpg')" }}
+          aria-hidden="true"
+        />
+        {/* Dark overlay so text remains readable */}
+        <div className="absolute inset-0 bg-slate-900/65" aria-hidden="true" />
+
+        {/* Content sits above the overlay */}
+        <div className="relative max-w-3xl mx-auto">
+          <p className="font-sans text-sm font-medium text-green-400 uppercase tracking-widest mb-4">
             Kampala, Uganda
           </p>
-          <h1 className="font-display font-bold text-5xl md:text-6xl text-slate-900 leading-tight">
+          <h1 className="font-display font-bold text-5xl md:text-6xl text-white leading-tight">
             Find skilled workers.<br />Get work done today.
           </h1>
-          <p className="font-sans text-lg text-slate-600 mt-6 max-w-xl mx-auto leading-relaxed">
+          <p className="font-sans text-lg text-slate-300 mt-6 max-w-xl mx-auto leading-relaxed">
             Djema connects you with plumbers, electricians, carpenters, and hundreds of other skilled workers near you in Kampala — no bank card, no CV, no waiting.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -82,7 +76,7 @@ export function HomePage() {
             </Button>
             <Link
               to="/register"
-              className="font-sans font-medium text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors"
+              className="font-sans font-medium text-sm text-slate-300 hover:text-white flex items-center gap-1 transition-colors"
             >
               Are you a provider? Join here
               <ArrowRight size={16} aria-hidden="true" />
@@ -114,49 +108,6 @@ export function HomePage() {
                 <h3 className="font-display font-semibold text-lg text-slate-900">{title}</h3>
                 <p className="font-sans text-sm text-slate-600 leading-relaxed">{body}</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SERVICE CATEGORIES ───────────────────────────────────────────── */}
-      {/* Functional icon grid — not decorative cards */}
-      <section className="py-20 px-4 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
-            <div>
-              <h2 className="font-display font-semibold text-3xl text-slate-900">
-                What do you need done?
-              </h2>
-              <p className="font-sans text-slate-600 mt-2">
-                Select a service to start your request.
-              </p>
-            </div>
-            <Link
-              to="/post-request"
-              className="font-sans text-sm font-medium text-green-600 hover:text-green-700 flex items-center gap-1 whitespace-nowrap transition-colors"
-            >
-              See all services
-              <ArrowRight size={14} aria-hidden="true" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {CATEGORIES.map(({ label, Icon, href }) => (
-              <Link
-                key={label}
-                to={href}
-                className="flex flex-col items-center gap-2 py-4 px-2 rounded-xl border border-slate-200 bg-white hover:border-green-500 hover:bg-green-50 transition-colors group"
-              >
-                <Icon
-                  size={22}
-                  className="text-slate-500 group-hover:text-green-600 transition-colors"
-                  aria-hidden="true"
-                />
-                <span className="font-sans text-xs text-slate-600 group-hover:text-green-700 text-center leading-tight transition-colors">
-                  {label}
-                </span>
-              </Link>
             ))}
           </div>
         </div>
