@@ -30,7 +30,8 @@ function AppShell() {
   const location = useLocation();
   // Dashboard routes get their own layout — no global navbar/footer
   const isDashboard = location.pathname.startsWith('/dashboard') ||
-    location.pathname.startsWith('/profile');
+    location.pathname.startsWith('/profile') ||
+    location.pathname === '/board';
 
   return (
     <>
