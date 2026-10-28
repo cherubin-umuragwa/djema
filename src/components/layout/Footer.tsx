@@ -26,7 +26,7 @@ export function Footer() {
           </Link>
         </div>
         <p className="font-sans text-xs text-slate-400">
-          © 2026 Djema · Built for PreDevFest Hackathon · Kampala, Uganda
+          © 2026 Djema · Kampala, Uganda
         </p>
       </div>
     </footer>
