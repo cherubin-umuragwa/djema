@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/common/Button';
@@ -10,6 +10,17 @@ export function Navbar() {
   const { user, isAuthenticated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Switch to solid white once the user scrolls past the hero (~80vh)
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > window.innerHeight * 0.75);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // run once on mount in case page is already scrolled
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   async function handleSignOut() {
     await signOut();
@@ -25,12 +36,18 @@ export function Navbar() {
         aria-label="Main navigation"
       >
         <div className="max-w-5xl mx-auto">
-          <div className="h-14 flex items-center justify-between px-5 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 shadow-sm">
+          <div className={`h-14 flex items-center justify-between px-5 rounded-2xl border shadow-sm transition-all duration-300 ${
+            scrolled
+              ? 'bg-white border-slate-200 shadow-md'
+              : 'bg-white/15 backdrop-blur-md border-white/25'
+          }`}>
 
             {/* Logo */}
             <Link
               to="/"
-              className="font-display font-bold text-xl text-white focus:outline-none focus:ring-2 focus:ring-white/50 rounded"
+              className={`font-display font-bold text-xl focus:outline-none focus:ring-2 rounded transition-colors duration-300 ${
+                scrolled ? 'text-slate-900 focus:ring-green-500' : 'text-white focus:ring-white/50'
+              }`}
             >
               Djema
             </Link>
@@ -41,14 +58,18 @@ export function Navbar() {
                 <>
                   <Link
                     to="/board"
-                    className="font-sans text-sm font-medium text-white/90 hover:text-white px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                    className={`font-sans text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+                      scrolled
+                        ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                    }`}
                   >
                     Browse Requests
                   </Link>
                   <div className="relative">
                     <button
                       onClick={() => setDropdownOpen((o) => !o)}
-                      className="w-9 h-9 rounded-full focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-1"
+                      className="w-9 h-9 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500"
                       aria-label="Account menu"
                       aria-expanded={dropdownOpen}
                     >
@@ -86,7 +107,11 @@ export function Navbar() {
                   <Button variant="primary" href="/post-request">Post a Request</Button>
                   <Link
                     to="/login"
-                    className="font-sans text-sm font-medium text-white/90 hover:text-white px-3 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                    className={`font-sans text-sm font-medium px-3 py-2 rounded-lg transition-colors ${
+                      scrolled
+                        ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                    }`}
                   >
                     Sign in as Provider
                   </Link>
@@ -96,7 +121,11 @@ export function Navbar() {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50"
+              className={`md:hidden p-2 rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+                scrolled
+                  ? 'text-slate-600 hover:bg-slate-100 focus:ring-green-500'
+                  : 'text-white hover:bg-white/10 focus:ring-white/50'
+              }`}
               onClick={() => setMobileOpen((o) => !o)}
               aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileOpen}
