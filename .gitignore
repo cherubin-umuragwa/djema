@@ -8,4 +8,5 @@ functions/.env
 *.local
 *.json.key
 service-account*.json
+tsconfig.tsbuildinfo
 .agents/
