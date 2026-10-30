@@ -7,6 +7,7 @@ import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/common/Input';
 import { Button } from '@/components/common/Button';
 import { signInWithEmail, signInWithGoogle } from '@/services/auth';
+import { getProvider } from '@/services/firestore';
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -54,8 +55,16 @@ export function LoginPage() {
   async function handleGoogle() {
     setFormError(null);
     try {
-      await signInWithGoogle();
-      navigate('/dashboard');
+      const cred = await signInWithGoogle();
+      // Check if this Google user already has a provider profile in Firestore.
+      // If yes → go to dashboard. If no → send them to /register to complete Step 2.
+      const existing = await getProvider(cred.user.uid);
+      if (existing) {
+        navigate('/dashboard');
+      } else {
+        // New Google user — redirect to register with a flag so Step 2 is shown
+        navigate('/register?google=1');
+      }
     } catch (err) {
       const code = err instanceof Error && 'code' in err ? (err as { code: string }).code : '';
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';

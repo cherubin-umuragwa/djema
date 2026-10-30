@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -64,6 +64,7 @@ function mapAuthError(code: string): string {
 
 export function RegisterPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { categories } = useCategories();
   const { showToast } = useToast();
@@ -73,6 +74,15 @@ export function RegisterPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // If a Google user was redirected here after login with no Firestore profile,
+  // skip straight to Step 2 using their existing auth session.
+  useEffect(() => {
+    if (searchParams.get('google') === '1' && user) {
+      setUid(user.uid);
+      setStep(2);
+    }
+  }, [searchParams, user]);
 
   // ─── Step 1 form ──────────────────────────────────────────────────────────
   const {
@@ -115,7 +125,14 @@ export function RegisterPage() {
     formState: { errors: errors2, isSubmitting: submitting2 },
   } = useForm<Step2Values>({
     resolver: zodResolver(step2Schema),
-    defaultValues: { skills: [], lat: 0, lng: 0, locationName: '' },
+    defaultValues: {
+      skills: [],
+      lat: 0,
+      lng: 0,
+      locationName: '',
+      // Pre-fill display name from Google profile if available
+      displayName: user?.displayName ?? '',
+    },
   });
 
   const bioValue = watch('bio', '');
